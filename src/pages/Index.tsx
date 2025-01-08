@@ -5,15 +5,46 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { ComplianceResult, ScheduleInput } from "@/types/schedule";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const complianceService = new ComplianceService();
 
+const defaultInput = {
+  state: "CA",
+  shifts: [
+    {
+      id: "shift1",
+      employeeId: "emp1",
+      date: "2024-03-20",
+      timeRange: {
+        start: "2024-03-20T09:00:00Z",
+        end: "2024-03-20T17:00:00Z"
+      },
+      breaks: [
+        {
+          type: "meal",
+          duration: 30,
+          isPaid: false
+        }
+      ]
+    }
+  ]
+};
+
 const Index = () => {
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(JSON.stringify(defaultInput, null, 2));
   const [results, setResults] = useState<ComplianceResult[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleCheck = () => {
+    setError(null);
+    
+    if (!input.trim()) {
+      setError("Please enter schedule data");
+      return;
+    }
+
     try {
       const scheduleInput: ScheduleInput = JSON.parse(input);
       const complianceResults = complianceService.checkCompliance(scheduleInput);
@@ -24,10 +55,15 @@ const Index = () => {
         description: "The schedule has been analyzed for compliance.",
       });
     } catch (error) {
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Invalid JSON format. Please check your input.";
+      
+      setError(errorMessage);
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Invalid input format",
+        description: errorMessage,
       });
     }
   };
@@ -41,30 +77,17 @@ const Index = () => {
           <label className="text-sm font-medium">Schedule Input (JSON)</label>
           <Textarea
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={`{
-  "state": "CA",
-  "shifts": [
-    {
-      "id": "shift1",
-      "employeeId": "emp1",
-      "date": "2024-03-20",
-      "timeRange": {
-        "start": "2024-03-20T09:00:00Z",
-        "end": "2024-03-20T17:00:00Z"
-      },
-      "breaks": [
-        {
-          "type": "meal",
-          "duration": 30,
-          "isPaid": false
-        }
-      ]
-    }
-  ]
-}`}
+            onChange={(e) => {
+              setInput(e.target.value);
+              setError(null);
+            }}
             className="font-mono min-h-[200px]"
           />
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
         </div>
 
         <Button onClick={handleCheck} className="w-full">
