@@ -15,7 +15,7 @@ export interface Shift {
   employeeId: string;
   date: string; // YYYY-MM-DD
   timeRange: TimeRange;
-  breaks: Break[];
+  breaks?: Break[]; // Now optional
 }
 
 export interface ScheduleInput {

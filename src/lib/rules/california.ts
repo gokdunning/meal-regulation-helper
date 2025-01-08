@@ -11,71 +11,60 @@ export class CaliforniaRules {
   static checkCompliance(shift: Shift): ComplianceResult {
     const issues: ComplianceIssue[] = [];
     const recommendations: string[] = [];
+    const requiredBreaks: Break[] = [];
     
     const shiftDuration = differenceInHours(
       parseISO(shift.timeRange.end),
       parseISO(shift.timeRange.start)
     );
 
-    // Check meal breaks
+    // Calculate required meal breaks
     const requiredMealBreaks = this.getRequiredMealBreaks(shiftDuration);
-    const actualMealBreaks = shift.breaks.filter(b => b.type === "meal");
-    
-    if (actualMealBreaks.length < requiredMealBreaks) {
+    for (let i = 0; i < requiredMealBreaks; i++) {
+      requiredBreaks.push({
+        type: "meal",
+        duration: this.MEAL_BREAK_DURATION,
+        isPaid: false
+      });
+    }
+
+    // Calculate required rest breaks
+    const requiredRestBreaks = Math.floor(shiftDuration / this.REST_BREAK_INTERVAL);
+    for (let i = 0; i < requiredRestBreaks; i++) {
+      requiredBreaks.push({
+        type: "rest",
+        duration: this.REST_BREAK_DURATION,
+        isPaid: true
+      });
+    }
+
+    // Generate recommendations and issues
+    if (requiredMealBreaks > 0) {
+      recommendations.push(
+        `Schedule ${requiredMealBreaks} unpaid meal break(s) of ${this.MEAL_BREAK_DURATION} minutes each`
+      );
       issues.push({
-        type: "error",
-        message: `Missing required meal break(s). Need ${requiredMealBreaks}, found ${actualMealBreaks.length}`,
+        type: "warning",
+        message: `Shift requires ${requiredMealBreaks} meal break(s)`,
         regulation: "CA Meal Break Requirement",
         shiftId: shift.id
       });
     }
 
-    // Check rest breaks
-    const requiredRestBreaks = Math.floor(shiftDuration / this.REST_BREAK_INTERVAL);
-    const actualRestBreaks = shift.breaks.filter(b => b.type === "rest");
-    
-    if (actualRestBreaks.length < requiredRestBreaks) {
+    if (requiredRestBreaks > 0) {
+      recommendations.push(
+        `Schedule ${requiredRestBreaks} paid rest break(s) of ${this.REST_BREAK_DURATION} minutes each`
+      );
       issues.push({
-        type: "error",
-        message: `Missing required rest break(s). Need ${requiredRestBreaks}, found ${actualRestBreaks.length}`,
+        type: "warning",
+        message: `Shift requires ${requiredRestBreaks} rest break(s)`,
         regulation: "CA Rest Break Requirement",
         shiftId: shift.id
       });
     }
 
-    // Check break durations
-    actualMealBreaks.forEach(break_ => {
-      if (break_.duration < this.MEAL_BREAK_DURATION) {
-        issues.push({
-          type: "error",
-          message: "Meal break duration less than required 30 minutes",
-          regulation: "CA Meal Break Duration",
-          shiftId: shift.id
-        });
-      }
-    });
-
-    actualRestBreaks.forEach(break_ => {
-      if (break_.duration < this.REST_BREAK_DURATION) {
-        issues.push({
-          type: "error",
-          message: "Rest break duration less than required 10 minutes",
-          regulation: "CA Rest Break Duration",
-          shiftId: shift.id
-        });
-      }
-    });
-
-    // Add recommendations
-    if (issues.length > 0) {
-      recommendations.push(
-        `Schedule ${requiredMealBreaks} meal break(s) of 30 minutes each`,
-        `Schedule ${requiredRestBreaks} rest break(s) of 10 minutes each`
-      );
-    }
-
     return {
-      isCompliant: issues.length === 0,
+      isCompliant: true, // Since we're just providing recommendations
       issues,
       recommendations
     };

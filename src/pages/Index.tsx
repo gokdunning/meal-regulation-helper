@@ -3,7 +3,7 @@ import { ComplianceService } from "@/lib/services/compliance-service";
 import { ComplianceDisplay } from "@/components/ComplianceDisplay";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { ComplianceResult, ScheduleInput } from "@/types/schedule";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -19,14 +19,7 @@ const defaultInput = {
       timeRange: {
         start: "2024-03-20T09:00:00Z",
         end: "2024-03-20T17:00:00Z"
-      },
-      breaks: [
-        {
-          type: "meal",
-          duration: 30,
-          isPaid: false
-        }
-      ]
+      }
     }
   ]
 };
