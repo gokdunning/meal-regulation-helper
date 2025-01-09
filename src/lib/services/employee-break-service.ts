@@ -76,8 +76,6 @@ export class EmployeeBreakService {
 
       if (timeUntilNotification > 0) {
         const timeout = setTimeout(() => {
-          // In a real application, this would trigger a push notification
-          // For now, we'll just show a toast
           toast({
             title: "Break Reminder",
             description: recommendation,
