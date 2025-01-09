@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ComplianceService } from "@/lib/services/compliance-service";
+import { EmployeeBreakService } from "@/lib/services/employee-break-service";
 import { ComplianceDisplay } from "@/components/ComplianceDisplay";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +9,7 @@ import { ComplianceResult, ScheduleInput } from "@/types/schedule";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const complianceService = new ComplianceService();
+const employeeBreakService = EmployeeBreakService.getInstance();
 
 const defaultInput = {
   state: "CA",
@@ -67,12 +69,21 @@ const Index = () => {
 
     try {
       const scheduleInput: ScheduleInput = JSON.parse(input);
-      const complianceResults = complianceService.checkCompliance(scheduleInput);
+      
+      // Simulate clock-in for each employee in the schedule
+      const complianceResults = scheduleInput.shifts.map(shift => {
+        return employeeBreakService.handleClockIn(
+          shift.employeeId,
+          scheduleInput.state,
+          shift.timeRange.start
+        );
+      });
+      
       setResults(complianceResults);
       
       toast({
         title: "Compliance Check Complete",
-        description: "The schedule has been analyzed for compliance.",
+        description: "Break schedules have been created for all employees.",
       });
     } catch (error) {
       const errorMessage = error instanceof Error 
