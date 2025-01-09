@@ -47,7 +47,7 @@ export class CaliforniaRules {
         type: "warning",
         message: `Shift requires ${requiredMealBreaks} meal break(s)`,
         regulation: "CA Meal Break Requirement",
-        shiftId: shift.id
+        shiftId: `${shift.employeeId}-${shift.id}`
       });
     }
 
@@ -59,14 +59,15 @@ export class CaliforniaRules {
         type: "warning",
         message: `Shift requires ${requiredRestBreaks} rest break(s)`,
         regulation: "CA Rest Break Requirement",
-        shiftId: shift.id
+        shiftId: `${shift.employeeId}-${shift.id}`
       });
     }
 
     return {
       isCompliant: true, // Since we're just providing recommendations
       issues,
-      recommendations
+      recommendations,
+      shiftId: `${shift.employeeId}-${shift.id}`
     };
   }
 

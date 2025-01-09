@@ -18,7 +18,7 @@ const defaultInput = {
       date: "2024-03-20",
       timeRange: {
         start: "2024-03-20T09:00:00Z",
-        end: "2024-03-20T17:00:00Z"
+        end: "2024-03-20T12:00:00Z"
       }
     },
     {
@@ -27,21 +27,21 @@ const defaultInput = {
       date: "2024-03-20",
       timeRange: {
         start: "2024-03-20T08:00:00Z",
-        end: "2024-03-20T18:30:00Z"
+        end: "2024-03-20T12:30:00Z"
       }
     },
     {
       id: "shift3",
-      employeeId: "emp1",
-      date: "2024-03-21",
+      employeeId: "emp3",
+      date: "2024-03-20",
       timeRange: {
-        start: "2024-03-21T11:00:00Z",
-        end: "2024-03-21T20:00:00Z"
+        start: "2024-03-20T09:00:00Z",
+        end: "2024-03-20T16:45:00Z"
       }
     },
     {
       id: "shift4",
-      employeeId: "emp3",
+      employeeId: "emp4",
       date: "2024-03-20",
       timeRange: {
         start: "2024-03-20T07:00:00Z",

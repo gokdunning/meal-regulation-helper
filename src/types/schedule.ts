@@ -34,4 +34,5 @@ export interface ComplianceResult {
   isCompliant: boolean;
   issues: ComplianceIssue[];
   recommendations: string[];
+  shiftId: string;
 }
