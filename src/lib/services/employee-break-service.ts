@@ -41,7 +41,7 @@ export class EmployeeBreakService {
   handleClockIn(event: ClockInEvent): EmployeeShiftStatus {
     const rules = this.getRulesForState(event.state);
     const shift = {
-      id: `shift-${Date.now()}`,
+      id: `${event.employeeId}-${Date.now()}`,
       employeeId: event.employeeId,
       date: event.timestamp.split('T')[0],
       timeRange: {

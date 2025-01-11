@@ -15,7 +15,7 @@ const defaultInput = {
   state: "CA",
   shifts: [
     {
-      id: "shift1",
+      id: "emp1-shift1",
       employeeId: "emp1",
       date: "2024-03-20",
       timeRange: {
@@ -24,30 +24,12 @@ const defaultInput = {
       }
     },
     {
-      id: "shift2",
+      id: "emp2-shift1",
       employeeId: "emp2",
       date: "2024-03-20",
       timeRange: {
         start: "2024-03-20T08:00:00Z",
         end: "2024-03-20T12:30:00Z"
-      }
-    },
-    {
-      id: "shift3",
-      employeeId: "emp3",
-      date: "2024-03-20",
-      timeRange: {
-        start: "2024-03-20T09:00:00Z",
-        end: "2024-03-20T16:45:00Z"
-      }
-    },
-    {
-      id: "shift4",
-      employeeId: "emp4",
-      date: "2024-03-20",
-      timeRange: {
-        start: "2024-03-20T07:00:00Z",
-        end: "2024-03-20T19:00:00Z"
       }
     }
   ]
@@ -69,14 +51,15 @@ const Index = () => {
 
     try {
       const scheduleInput: ScheduleInput = JSON.parse(input);
+      const complianceResults = complianceService.checkCompliance(scheduleInput);
       
-      // Simulate clock-in for each employee in the schedule
-      const complianceResults = scheduleInput.shifts.map(shift => {
-        return employeeBreakService.handleClockIn(
-          shift.employeeId,
-          scheduleInput.state,
-          shift.timeRange.start
-        );
+      // Simulate clock-in for each shift
+      scheduleInput.shifts.forEach(shift => {
+        employeeBreakService.handleClockIn({
+          employeeId: shift.employeeId,
+          timestamp: shift.timeRange.start,
+          state: scheduleInput.state
+        });
       });
       
       setResults(complianceResults);
